@@ -1,0 +1,68 @@
+from PIL import Image
+import numpy as np
+import os
+
+def encrypt_image(image_path, key, output_path="encrypted_image.png"):
+    """
+    Encrypts an image by adding a key value to each pixel.
+    """
+    try:
+        img = Image.open(image_path).convert('L')  # Convert to grayscale
+        pixels = np.array(img)
+
+        # Add key to each pixel value and wrap using modulo 256
+        encrypted_pixels = (pixels + key) % 256
+
+        encrypted_img = Image.fromarray(encrypted_pixels.astype('uint8'))
+        encrypted_img.save(output_path)
+        printf("Encrypted image saved as '{output_path}'")
+
+    except Exception as e:
+        printf("Error: {e}")
+
+def decrypt_image(encrypted_path, key, output_path="decrypted_image.png"):
+    """
+    Decrypts an encrypted image by subtracting the key value from each pixel.
+    """
+    try:
+        img = Image.open(encrypted_path).convert('L')
+        pixels = np.array(img)
+
+        # Subtract key and wrap using modulo 256
+        decrypted_pixels = (pixels - key) % 256
+
+        decrypted_img = Image.fromarray(decrypted_pixels.astype('uint8'))
+        decrypted_img.save(output_path)
+        print(f"✅ Decrypted image saved as '{output_path}'")
+
+    except Exception as e:
+        printf("Error: {e}")
+
+def main():
+    print("=== Pixel-Based Image Encryption ===")
+    print("1. Encrypt Image")
+    print("2. Decrypt Image")
+    choice = input("Choose option (1 or 2): ")
+
+    if choice not in ['1', '2']:
+        print("Invalid choice.")
+        return
+
+    image_path = input("Enter image file path (e.g., sample_image.png): ")
+    if not os.path.exists(image_path):
+        print("File not found.")
+        return
+
+    try:
+        key = int(input("Enter numeric key (e.g., 50): "))
+    except ValueError:
+        print("Invalid key. Must be an integer.")
+        return
+
+    if choice == '1':
+        encrypt_image(image_path, key)
+    else:
+        decrypt_image(image_path, key)
+
+if __name__ == "__main__":
+    main()
